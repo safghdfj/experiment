@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XLOOKUP 互动学习教程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .formula-part {
+            transition: all 0.3s ease;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .interactive-input {
+            transition: all 0.3s ease;
+        }
+        .interactive-input:focus {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        }
+        .excel-sim {
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .excel-sim-header {
+            background-color: #f3f4f6;
+            padding: 6px 8px;
+            font-weight: bold;
+            color: #4b5563;
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+        .excel-sim-cell {
+            padding: 8px;
+            border: 1px solid #e5e7eb;
+            min-width: 90px;
+            text-align: left;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .excel-sim-cell.clickable:hover {
+            background-color: #eff6ff;
+        }
+        .excel-sim-cell.active-formula-cell {
+            border: 2px solid #2563eb;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4);
+            font-weight: bold;
+        }
+        .highlight-lookup-value { border: 2px solid #3b82f6; }
+        .highlight-lookup-array { border: 2px solid #22c55e; background-color: #dcfce7 !important; }
+        .highlight-return-array { border: 2px solid #a855f7; background-color: #f3e8ff !important; }
+        #formula-bar {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            min-height: 40px;
+        }
+        #instruction-prompt {
+            transition: background-color 0.3s;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 p-4 sm:p-6 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl sm:text-4xl font-bold text-blue-600">XLOOKUP 互动学习教程</h1>
+            <p class="mt-2 text-lg text-gray-600">亲手操作，轻松掌握 Excel 的查找神器！</p>
+        </header>
+
+        <!-- 场景一: 基础查找 -->
+        <div id="step1" class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
+            <h2 class="text-2xl font-bold mb-4 text-gray-700">场景一：基础查找</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">我们的数据源 (A-C列)</h3>
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="bg-gray-100"><th class="p-2 border">A: 产品ID</th><th class="p-2 border">B: 产品名称</th><th class="p-2 border">C: 价格 (元)</th></tr></thead>
+                        <tbody id="data-table-1">
+                            <tr><td class="p-2 border">101</td><td class="p-2 border">笔记本</td><td class="p-2 border">5500</td></tr>
+                            <tr><td class="p-2 border">102</td><td class="p-2 border">鼠标</td><td class="p-2 border">150</td></tr>
+                            <tr><td class="p-2 border">103</td><td class="p-2 border">键盘</td><td class="p-2 border">320</td></tr>
+                            <tr><td class="p-2 border">104</td><td class="p-2 border">显示器</td><td class="p-2 border">1200</td></tr>
+                            <tr><td class="p-2 border">105</td><td class="p-2 border">摄像头</td><td class="p-2 border">280</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-lg mb-2">动手试一试</h3>
+                    <label for="lookup-input-1" class="block mb-2 font-medium">输入或选择一个产品名称:</label>
+                    <input type="text" id="lookup-input-1" list="product-list" class="w-full p-2 border rounded-md interactive-input" placeholder="例如：键盘">
+                    <datalist id="product-list"><option value="笔记本"><option value="鼠标"><option value="键盘"><option value="显示器"><option value="摄像头"><option value="耳机"></datalist>
+                    <div class="mt-4"><p class="font-medium">查询结果 (价格):</p><div id="result-1" class="mt-1 p-2 bg-white rounded-md h-10 flex items-center font-bold text-blue-600 text-lg"></div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 场景二: 反向查找 -->
+        <div id="step2" class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
+            <h2 class="text-2xl font-bold mb-4 text-gray-700">场景二：反向查找</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-lg mb-2">数据源 (A-C列)</h3>
+                    <table class="w-full text-left border-collapse">
+                        <thead><tr class="bg-gray-100"><th class="p-2 border">A: 产品ID</th><th class="p-2 border">B: 产品名称</th><th class="p-2 border">C: 价格 (元)</th></tr></thead>
+                        <tbody id="data-table-2">
+                            <tr><td class="p-2 border">101</td><td class="p-2 border">笔记本</td><td class="p-2 border">5500</td></tr>
+                            <tr><td class="p-2 border">102</td><td class="p-2 border">鼠标</td><td class="p-2 border">150</td></tr>
+                            <tr><td class="p-2 border">103</td><td class="p-2 border">键盘</td><td class="p-2 border">320</td></tr>
+                            <tr><td class="p-2 border">104</td><td class="p-2 border">显示器</td><td class="p-2 border">1200</td></tr>
+                            <tr><td class="p-2 border">105</td><td class="p-2 border">摄像头</td><td class="p-2 border">280</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-lg mb-2">动手试一试</h3>
+                    <label for="lookup-input-2" class="block mb-2 font-medium">输入一个价格:</label>
+                    <input type="number" id="lookup-input-2" class="w-full p-2 border rounded-md interactive-input" placeholder="例如：320 或 999">
+                    <div class="mt-4"><p class="font-medium">查询结果 (产品名称):</p><div id="result-2" class="mt-1 p-2 bg-white rounded-md h-10 flex items-center font-bold text-green-600 text-lg"></div></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 场景三: 可视化步骤教学 -->
+        <div id="step3" class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
+            <h2 class="text-2xl font-bold mb-4 text-gray-700">场景三：可视化步骤教学</h2>
+             <p class="mb-4">我们将根据 **产品ID (A列)** 查找 **产品名称 (B列)**。假设我们在 E2 单元格输入要查找的ID "103"，目标是在 F2 单元格输出结果。</p>
+            <div class="p-4 bg-gray-50 rounded-lg">
+                <h4 class="font-bold text-lg mb-3">完整步骤拆解：</h4>
+                <div class="excel-sim">
+                    <table class="w-full">
+                        <thead>
+                            <tr>
+                                <th class="excel-sim-header w-12"></th>
+                                <th class="excel-sim-header">A</th><th class="excel-sim-header">B</th><th class="excel-sim-header">C</th>
+                                <th class="excel-sim-header w-8"></th>
+                                <th class="excel-sim-header">E</th><th class="excel-sim-header">F</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="excel-sim-header">1</td>
+                                <td class="excel-sim-cell font-bold">产品ID</td><td class="excel-sim-cell font-bold">产品名称</td><td class="excel-sim-cell font-bold">价格</td>
+                                <td class="bg-gray-50 border-0"></td>
+                                <td class="excel-sim-cell font-bold">查找ID</td><td class="excel-sim-cell font-bold">结果</td>
+                            </tr>
+                            <tr>
+                                <td class="excel-sim-header">2</td>
+                                <td class="excel-sim-cell excel-sim-highlight-lookup-array">101</td><td class="excel-sim-cell excel-sim-highlight-return-array">笔记本</td><td class="excel-sim-cell">5500</td>
+                                <td class="bg-gray-50 border-0"></td>
+                                <td class="excel-sim-cell excel-sim-highlight-lookup">103</td><td class="excel-sim-cell excel-sim-highlight-result">键盘</td>
+                            </tr>
+                            <tr>
+                                <td class="excel-sim-header">3</td>
+                                <td class="excel-sim-cell excel-sim-highlight-lookup-array">102</td><td class="excel-sim-cell excel-sim-highlight-return-array">鼠标</td><td class="excel-sim-cell">150</td>
+                                <td class="bg-gray-50 border-0"></td>
+                                <td class="excel-sim-cell"></td><td class="excel-sim-cell"></td>
+                            </tr>
+                             <tr>
+                                <td class="excel-sim-header">4</td>
+                                <td class="excel-sim-cell excel-sim-highlight-lookup-array font-bold text-green-700">103</td><td class="excel-sim-cell excel-sim-highlight-return-array font-bold text-purple-700">键盘</td><td class="excel-sim-cell">320</td>
+                                <td class="bg-gray-50 border-0"></td>
+                                <td class="excel-sim-cell"></td><td class="excel-sim-cell"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 场景四: 终极实战模拟 -->
+        <div id="step4" class="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-200">
+            <h2 class="text-2xl font-bold mb-4 text-gray-700">场景四：终极实战模拟</h2>
+            <p class="mb-4 text-gray-600">是时候像在真实Excel中一样操作了！请根据下方提示，通过点击单元格来构建完整的XLOOKUP公式。</p>
+            
+            <div id="instruction-prompt" class="p-3 mb-4 text-center font-semibold text-white bg-blue-500 rounded-md shadow">
+                请点击 <span class="font-bold bg-white text-blue-600 px-2 py-1 rounded">L2</span> 单元格开始输入公式
+            </div>
+
+            <div class="flex items-center gap-2 mb-2">
+                <span class="font-bold text-gray-500 text-sm">fx</span>
+                <div id="formula-bar"></div>
+            </div>
+
+            <div id="interactive-excel-area" class="excel-sim">
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th class="excel-sim-header w-12"></th>
+                            <th class="excel-sim-header">H</th><th class="excel-sim-header">I</th>
+                            <th class="excel-sim-header w-8"></th>
+                            <th class="excel-sim-header">K</th><th class="excel-sim-header">L</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="excel-sim-header">1</td>
+                            <td class="excel-sim-cell font-bold">姓名</td><td class="excel-sim-cell font-bold">部门</td>
+                            <td class="bg-gray-50 border-0"></td>
+                            <td class="excel-sim-cell font-bold">查找姓名</td><td class="excel-sim-cell font-bold">部门查询结果</td>
+                        </tr>
+                        <tr>
+                            <td class="excel-sim-header">2</td>
+                            <td class="excel-sim-cell clickable" data-range="H2:H4">张三</td><td class="excel-sim-cell clickable" data-range="I2:I4">销售部</td>
+                            <td class="bg-gray-50 border-0"></td>
+                            <td class="excel-sim-cell clickable" data-cell="K2">李四</td><td id="result-cell-L2" class="excel-sim-cell clickable font-bold text-gray-400" data-cell="L2">点击这里开始</td>
+                        </tr>
+                        <tr>
+                            <td class="excel-sim-header">3</td>
+                            <td class="excel-sim-cell clickable" data-range="H2:H4">李四</td><td class="excel-sim-cell clickable" data-range="I2:I4">市场部</td>
+                            <td class="bg-gray-50 border-0"></td>
+                            <td class="excel-sim-cell clickable" data-cell="K3">王五</td><td id="result-cell-L3" class="excel-sim-cell clickable font-bold text-gray-400" data-cell="L3"></td>
+                        </tr>
+                         <tr>
+                            <td class="excel-sim-header">4</td>
+                            <td class="excel-sim-cell clickable" data-range="H2:H4">王五</td><td class="excel-sim-cell clickable" data-range="I2:I4">技术部</td>
+                            <td class="bg-gray-50 border-0"></td>
+                            <td class="excel-sim-cell"></td><td class="excel-sim-cell"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button id="reset-button" class="mt-4 px-4 py-2 bg-red-500 text-white font-semibold rounded-md shadow hover:bg-red-600 transition-colors hidden">重置/重新开始</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        const products = [
+            { id: 101, name: '笔记本', price: 5500 }, { id: 102, name: '鼠标', price: 150 },
+            { id: 103, name: '键盘', price: 320 }, { id: 104, name: '显示器', price: 1200 },
+            { id: 105, name: '摄像头', price: 280 },
+        ];
+        const employees = {
+            'H2:H4': ['张三', '李四', '王五'],
+            'I2:I4': ['销售部', '市场部', '技术部'],
+        };
+        const employeeData = [
+            { id: 'S001', name: '张三', department: '销售部' },
+            { id: 'S002', name: '李四', department: '市场部' },
+            { id: 'S003', name: '王五', department: '技术部' },
+        ];
+
+        // --- SCENE 1 & 2 LOGIC (Simplified for brevity) ---
+        document.getElementById('lookup-input-1').addEventListener('input', (e) => {
+            const product = products.find(p => p.name === e.target.value);
+            document.getElementById('result-1').textContent = product ? `¥ ${product.price}` : '未找到';
+        });
+        document.getElementById('lookup-input-2').addEventListener('input', (e) => {
+            const product = products.find(p => p.price === parseInt(e.target.value));
+            document.getElementById('result-2').textContent = product ? product.name : '无此价位产品';
+        });
+
+        // --- SCENE 4: INTERACTIVE EXCEL SIMULATOR ---
+        const interactiveArea = document.getElementById('interactive-excel-area');
+        const formulaBar = document.getElementById('formula-bar');
+        const instructionPrompt = document.getElementById('instruction-prompt');
+        const resetButton = document.getElementById('reset-button');
+        
+        let formulaState = {
+            isEditing: false,
+            activeCell: null,
+            step: 0, // 0: inactive, 1: select lookup_value, 2: select lookup_array, 3: select return_array
+            parts: {
+                lookupValue: null,
+                lookupArray: null,
+                returnArray: null,
+            }
+        };
+
+        const instructions = [
+            '请点击任意结果单元格 (如L2) 开始',
+            '第1步: 请点击包含<strong class="text-yellow-300">查找值</strong>的单元格 (例如 K2)',
+            '第2步: 请点击<strong class="text-yellow-300">查找区域</strong>中的任意单元格 (姓名 H列)',
+            '第3步: 请点击<strong class="text-yellow-300">返回区域</strong>中的任意单元格 (部门 I列)',
+            '恭喜！公式完成！'
+        ];
+
+        function updateUI() {
+            // Update instruction prompt
+            instructionPrompt.innerHTML = instructions[formulaState.step];
+            instructionPrompt.className = 'p-3 mb-4 text-center font-semibold text-white rounded-md shadow transition-colors ';
+            if (formulaState.step === 0) instructionPrompt.classList.add('bg-gray-500');
+            if (formulaState.step >= 1 && formulaState.step <= 3) instructionPrompt.classList.add('bg-blue-500');
+            if (formulaState.step === 4) instructionPrompt.classList.add('bg-green-600');
+
+            // Update formula bar
+            let formulaText = '';
+            if (formulaState.isEditing) {
+                formulaText = `=XLOOKUP(${formulaState.parts.lookupValue || ''}`;
+                if (formulaState.parts.lookupArray) {
+                    formulaText += `, ${formulaState.parts.lookupArray}`;
+                }
+                if (formulaState.parts.returnArray) {
+                    formulaText += `, ${formulaState.parts.returnArray})`;
+                }
+            }
+            formulaBar.textContent = formulaText;
+            
+            // Show/hide reset button
+            resetButton.classList.toggle('hidden', !formulaState.isEditing);
+
+            // Clear all highlights
+            interactiveArea.querySelectorAll('.excel-sim-cell').forEach(c => {
+                 c.classList.remove('active-formula-cell', 'highlight-lookup-value', 'highlight-lookup-array', 'highlight-return-array');
+            });
+
+            // Apply highlights based on state
+            if(formulaState.activeCell) formulaState.activeCell.classList.add('active-formula-cell');
+            if(formulaState.parts.lookupValue) document.querySelector(`[data-cell="${formulaState.parts.lookupValue}"]`).classList.add('highlight-lookup-value');
+            if(formulaState.parts.lookupArray) document.querySelectorAll(`[data-range="${formulaState.parts.lookupArray}"]`).forEach(c => c.classList.add('highlight-lookup-array'));
+            if(formulaState.parts.returnArray) document.querySelectorAll(`[data-range="${formulaState.parts.returnArray}"]`).forEach(c => c.classList.add('highlight-return-array'));
+        }
+
+        function calculateResult() {
+            const { lookupValue, lookupArray, returnArray } = formulaState.parts;
+            if (!lookupValue || !lookupArray || !returnArray) return;
+
+            const lookupValueContent = document.querySelector(`[data-cell="${lookupValue}"]`).textContent;
+            const lookupData = employees[lookupArray];
+            const returnData = employees[returnArray];
+
+            const index = lookupData.indexOf(lookupValueContent);
+            const result = (index !== -1) ? returnData[index] : '#N/A';
+            
+            formulaState.activeCell.textContent = result;
+            formulaState.activeCell.classList.remove('text-gray-400');
+        }
+
+        function reset() {
+            formulaState = {
+                isEditing: false,
+                activeCell: null,
+                step: 0,
+                parts: { lookupValue: null, lookupArray: null, returnArray: null }
+            };
+            document.querySelectorAll('#result-cell-L2, #result-cell-L3').forEach(cell => {
+                cell.textContent = cell.id === 'result-cell-L2' ? '点击这里开始' : '';
+                cell.classList.add('text-gray-400');
+            });
+            updateUI();
+        }
+
+        interactiveArea.addEventListener('click', (e) => {
+            const cell = e.target.closest('.excel-sim-cell.clickable');
+            if (!cell) return;
+
+            // Step 0: Start editing
+            if (!formulaState.isEditing) {
+                if (cell.id.startsWith('result-cell')) {
+                    reset(); // Reset before starting a new formula
+                    formulaState.isEditing = true;
+                    formulaState.activeCell = cell;
+                    formulaState.activeCell.textContent = '';
+                    formulaState.step = 1;
+                    updateUI();
+                }
+                return;
+            }
+
+            // Formula building steps
+            switch (formulaState.step) {
+                case 1: // Expecting lookup_value
+                    if (cell.dataset.cell && !cell.id.startsWith('result-cell')) {
+                        formulaState.parts.lookupValue = cell.dataset.cell;
+                        formulaState.step = 2;
+                    }
+                    break;
+                case 2: // Expecting lookup_array
+                    if (cell.dataset.range) {
+                        formulaState.parts.lookupArray = cell.dataset.range;
+                        formulaState.step = 3;
+                    }
+                    break;
+                case 3: // Expecting return_array
+                    if (cell.dataset.range && cell.dataset.range !== formulaState.parts.lookupArray) {
+                        formulaState.parts.returnArray = cell.dataset.range;
+                        formulaState.step = 4;
+                        calculateResult();
+                    }
+                    break;
+            }
+            updateUI();
+        });
+
+        resetButton.addEventListener('click', reset);
+
+        // Initial UI setup
+        updateUI();
+    </script>
+</body>
+</html>
