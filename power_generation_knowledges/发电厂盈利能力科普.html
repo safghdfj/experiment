@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发电经济学 (Power Plant Economics)：发电厂盈利能力分析</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #E5DDC8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 350px;
+                max-height: 60vh;
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#004369] mb-1">发电经济学</h1>
+            <p class="text-lg md:text-xl text-[#01949A] mb-4">Power Plant Economics</p>
+            <p class="text-xl md:text-2xl text-gray-700">发电厂盈利能力信息图</p>
+        </header>
+
+        <section id="formula" class="mb-12">
+            <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-8 text-center">
+                <h2 class="text-2xl font-semibold text-[#004369] mb-1">核心盈利公式</h2>
+                <p class="text-lg text-gray-500 mb-4">Core Profitability Formula</p>
+                <p class="text-lg text-gray-600 mb-6">发电厂的财务成功核心在于一个简单的等式。当单位能源的售电价格高于其生产成本时，即可实现盈利。</p>
+                <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-xl md:text-2xl font-bold">
+                    <div class="text-center">
+                        <span class="text-[#01949A] bg-white px-4 py-2 rounded-lg shadow">上网电价</span>
+                        <p class="text-sm text-gray-500 mt-1">On-grid Tariff</p>
+                    </div>
+                    <span class="text-4xl text-[#DB1F48]">-</span>
+                    <div class="text-center">
+                        <span class="text-[#DB1F48] bg-white px-4 py-2 rounded-lg shadow">度电成本</span>
+                         <p class="text-sm text-gray-500 mt-1">Cost per kWh</p>
+                    </div>
+                    <span class="text-4xl text-gray-700">=</span>
+                    <div class="text-center">
+                        <span class="text-green-600 bg-white px-4 py-2 rounded-lg shadow">利润</span>
+                        <p class="text-sm text-gray-500 mt-1">Profit</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="pillars" class="mb-12">
+             <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#004369] mb-1">盈利能力的四大支柱</h2>
+                <p class="text-lg text-[#01949A] mb-8">The Four Pillars of Profitability</p>
+             </div>
+             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-5xl mb-4">🏭</div>
+                    <h3 class="text-xl font-semibold text-[#004369] mb-1">装机容量</h3>
+                    <p class="text-sm text-gray-500 mb-2">Installed Capacity</p>
+                    <p class="text-gray-600">最大输出功率 (MW/GW)，决定了电厂的规模、初始投资和收入潜力。</p>
+                </div>
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-5xl mb-4">💰</div>
+                    <h3 class="text-xl font-semibold text-[#004369] mb-1">上网电价</h3>
+                    <p class="text-sm text-gray-500 mb-2">On-grid Tariff</p>
+                    <p class="text-gray-600">电网支付的批发价格 (元/千瓦时)，设定了成本必须低于的盈利基准。</p>
+                </div>
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-5xl mb-4">⏰</div>
+                    <h3 class="text-xl font-semibold text-[#004369] mb-1">利用小时数</h3>
+                    <p class="text-sm text-gray-500 mb-2">Utilization Hours</p>
+                    <p class="text-gray-600">最关键的变量。更高的小时数意味着更多的收入和更低的单位固定成本。</p>
+                </div>
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6 text-center">
+                    <div class="text-5xl mb-4">💸</div>
+                    <h3 class="text-xl font-semibold text-[#004369] mb-1">度电成本 (LCOE)</h3>
+                     <p class="text-sm text-gray-500 mb-2">Levelized Cost of Energy</p>
+                    <p class="text-gray-600">生产一度电的总成本，揭示了电厂的效率和风险结构。</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="utilization" class="mb-12 bg-[#F8F1F1] rounded-lg shadow-lg p-6 md:p-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#004369] mb-1">决定性因素：年利用小时数</h2>
+                <p class="text-lg text-[#01949A] mb-2">Annual Utilization Hours</p>
+            </div>
+            <p class="text-center text-gray-600 max-w-3xl mx-auto mb-8">并非所有电源都生而平等。年利用小时数——即电厂等效于满负荷 (Full Load) 运行的时间——因技术类型而异。这一指标同时决定了收入和成本效益，揭示了为何像核电这样的基荷电源 (Base Load Power) 与太阳能等间歇性电源 (Intermittent Power Source) 在财务上存在巨大差异。</p>
+            <div class="chart-container">
+                <canvas id="utilizationHoursChart"></canvas>
+            </div>
+        </section>
+
+        <section id="cost-structure" class="mb-12">
+             <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#004369] mb-1">两种成本结构的故事</h2>
+                <p class="text-lg text-[#01949A] mb-8">A Tale of Two Cost Structures</p>
+             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-semibold text-[#004369] mb-1">火电</h3>
+                        <p class="text-md text-gray-500 mb-2">Thermal Power</p>
+                    </div>
+                    <p class="text-center text-gray-600 mb-4">其盈利能力对波动的燃料价格 (Fuel Price) 高度敏感，燃料是运营成本的主要部分。</p>
+                    <div class="chart-container h-64 md:h-80 max-h-[350px]">
+                        <canvas id="thermalCostChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-[#F8F1F1] rounded-lg shadow-lg p-6">
+                    <div class="text-center">
+                        <h3 class="text-2xl font-semibold text-[#004369] mb-1">可再生能源</h3>
+                        <p class="text-md text-gray-500 mb-2">Renewable Energy</p>
+                    </div>
+                    <p class="text-center text-gray-600 mb-4">燃料免费，其主要挑战是通过持续发电来收回巨额的前期投资 (Upfront Investment)。</p>
+                    <div class="chart-container h-64 md:h-80 max-h-[350px]">
+                        <canvas id="renewableCostChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="profit-story" class="mb-12 bg-[#F8F1F1] rounded-lg shadow-lg p-6 md:p-8">
+             <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#004369] mb-1">盈利流程深度剖析</h2>
+                <p class="text-lg text-[#01949A] mb-2">In-depth Analysis of the Profitability Process</p>
+             </div>
+             <p class="text-center text-gray-600 max-w-4xl mx-auto mb-8">从巨额投资到最终的财务报表，发电厂的盈利之路环环相扣。每一步都至关重要，但“利用小时数”是撬动盈亏平衡点的核心杠杆。</p>
+             <div class="flex flex-col items-center space-y-4">
+
+                 <div class="bg-white p-4 rounded-lg shadow w-full md:w-5/6 text-center border-l-4 border-[#004369]">
+                     <div class="font-bold text-xl text-[#004369]">第1步: 资本投入与固定成本的诞生</div>
+                      <p class="text-sm text-gray-500">Capital Investment & Birth of Fixed Costs</p>
+                     <p class="mt-2">一切始于基于<span class="font-semibold">装机容量 (Installed Capacity)</span>的巨额初始投资(CAPEX)。这笔钱直接转化为每年必须承担的<span class="font-bold text-[#DB1F48]">固定成本 (Fixed Cost)</span>，主要包括设备折旧 (Depreciation) 和融资利息 (Financing Interest)。无论电厂是否发电，这笔成本都雷打不动。</p>
+                 </div>
+                 
+                 <div class="h-8 w-1 bg-[#01949A] opacity-50"></div>
+
+                 <div class="bg-white p-4 rounded-lg shadow w-full md:w-5/6 text-center border-l-4 border-[#01949A]">
+                     <div class="font-bold text-xl text-[#01949A]">第2步: 外部定价与收入天花板</div>
+                      <p class="text-sm text-gray-500">External Pricing & Revenue Ceiling</p>
+                     <p class="mt-2">电厂的收入来源是<span class="font-semibold">上网电价 (On-grid Tariff)</span>，即卖给电网的单价。这个价格通常由政策或市场决定，电厂自身几乎没有议价能力。它设定了电厂盈利的“天花板”，所有成本必须控制在此线以下。</p>
+                 </div>
+
+                 <div class="h-8 w-1 bg-[#01949A] opacity-50"></div>
+
+                 <div class="bg-white p-4 rounded-lg shadow w-full md:w-5/6 text-center border-l-4 border-[#DB1F48]">
+                     <div class="font-bold text-xl text-[#DB1F48]">第3步: 运营中的可变成本</div>
+                      <p class="text-sm text-gray-500">Variable Costs in Operation</p>
+                     <p class="mt-2">电厂运行时会产生<span class="font-bold">可变成本 (Variable Cost)</span>。对于火电厂，这是昂贵的<span class="font-semibold">燃料成本 (Fuel Cost)</span>；对于新能源，这部分成本（如运维 O&M）占比极低。</p>
+                 </div>
+                 
+                 <div class="h-8 w-1 bg-[#01949A] opacity-50"></div>
+
+                 <div class="w-full md:w-5/6 text-center font-bold text-2xl text-black py-4">第4步: 核心杠杆 - 利用小时数如何决定命运 (The Core Lever)</div>
+                 
+                 <div class="flex flex-col md:flex-row w-full justify-center items-stretch md:space-x-8 space-y-4 md:space-y-0 mt-4">
+                     <div class="flex-1 bg-red-50 border-2 border-dashed border-red-300 p-6 rounded-lg shadow-inner">
+                         <h4 class="font-bold text-xl text-red-600 text-center mb-1">情景 A: 低利用率 (亏损之路)</h4>
+                         <p class="text-center text-sm text-red-400 mb-3">Low Utilization (Path to Loss)</p>
+                         <div class="text-sm space-y-3">
+                            <p><span class="font-semibold">总发电量</span> = 容量 × <span class="font-bold text-red-700">低小时数</span> ➡️ <span class="font-semibold">总收入有限</span></p>
+                            <p><span class="font-semibold">度电固定成本</span> = 总固定成本 ÷ <span class="font-bold text-red-700">少量发电量</span> ➡️ <span class="font-semibold">成本被放大</span></p>
+                         </div>
+                         <div class="bg-white p-3 rounded text-center mt-4">
+                            <p class="font-mono text-sm font-semibold">度电成本 (0.6元) > 上网电价 (0.5元)</p>
+                            <p class="text-xs font-mono text-gray-500">[摊薄后固定成本 0.4元 + 可变成本 0.2元]</p>
+                            <p class="mt-2 text-2xl font-bold text-red-700">最终结果: 亏损 (Loss)</p>
+                         </div>
+                     </div>
+                     <div class="flex-1 bg-green-50 border-2 border-dashed border-green-300 p-6 rounded-lg shadow-inner">
+                         <h4 class="font-bold text-xl text-green-600 text-center mb-1">情景 B: 高利用率 (盈利之路)</h4>
+                         <p class="text-center text-sm text-green-400 mb-3">High Utilization (Path to Profit)</p>
+                          <div class="text-sm space-y-3">
+                            <p><span class="font-semibold">总发电量</span> = 容量 × <span class="font-bold text-green-700">高小时数</span> ➡️ <span class="font-semibold">总收入最大化</span></p>
+                            <p><span class="font-semibold">度电固定成本</span> = 总固定成本 ÷ <span class="font-bold text-green-700">海量发电量</span> ➡️ <span class="font-semibold">成本被摊薄</span></p>
+                         </div>
+                         <div class="bg-white p-3 rounded text-center mt-4">
+                             <p class="font-mono text-sm font-semibold">度电成本 (0.4元) < 上网电价 (0.5元)</p>
+                             <p class="text-xs font-mono text-gray-500">[摊薄后固定成本 0.2元 + 可变成本 0.2元]</p>
+                            <p class="mt-2 text-2xl font-bold text-green-700">最终结果: 盈利 (Profit)</p>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+        </section>
+
+        <section id="glossary" class="mb-12 bg-[#F8F1F1] rounded-lg shadow-lg p-6 md:p-8">
+            <div class="text-center">
+                <h2 class="text-3xl font-bold text-[#004369] mb-1">核心术语对照表</h2>
+                <p class="text-lg text-[#01949A] mb-8">Glossary of Key Terms</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 max-w-4xl mx-auto">
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">装机容量</dt>
+                    <dd class="text-gray-600">Installed Capacity</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">上网电价</dt>
+                    <dd class="text-gray-600">On-grid Tariff</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">年利用小时数</dt>
+                    <dd class="text-gray-600">Annual Utilization Hours</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">度电成本</dt>
+                    <dd class="text-gray-600">LCOE (Levelized Cost of Energy)</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">固定成本</dt>
+                    <dd class="text-gray-600">Fixed Cost</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">可变成本</dt>
+                    <dd class="text-gray-600">Variable Cost</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">初始投资</dt>
+                    <dd class="text-gray-600">CAPEX (Capital Expenditure)</dd>
+                </dl>
+                <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">运维成本</dt>
+                    <dd class="text-gray-600">O&M (Operations & Maintenance) Cost</dd>
+                </dl>
+                 <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">基荷电源</dt>
+                    <dd class="text-gray-600">Base Load Power</dd>
+                </dl>
+                 <dl class="flex justify-between border-b pb-2">
+                    <dt class="font-semibold text-[#004369]">间歇性</dt>
+                    <dd class="text-gray-600">Intermittency</dd>
+                </dl>
+            </div>
+        </section>
+
+        <footer class="text-center mt-12 py-6 border-t-2 border-[#01949A]">
+            <p class="text-lg font-semibold text-[#004369]">结论 (Conclusion)</p>
+            <p class="text-gray-600 max-w-3xl mx-auto">发电厂的盈利能力是一场在固定售价和可变生产成本之间的动态赛跑。胜利者几乎总是由**年利用小时数**决定——这是一个能同时提升收入并压缩单位成本的强大杠杆。</p>
+        </footer>
+    </div>
+
+<script>
+    Chart.register(ChartDataLabels);
+
+    function wrapLabels(label) {
+        if (typeof label !== 'string' || label.length <= 16) {
+            return label;
+        }
+        const words = label.split(' ');
+        const lines = [];
+        let currentLine = '';
+        words.forEach(word => {
+            if ((currentLine + ' ' + word).trim().length > 16) {
+                lines.push(currentLine.trim());
+                currentLine = word;
+            } else {
+                currentLine = (currentLine + ' ' + word).trim();
+            }
+        });
+        if (currentLine) {
+            lines.push(currentLine.trim());
+        }
+        return lines;
+    }
+
+    const tooltipTitleCallback = (tooltipItems) => {
+        const item = tooltipItems[0];
+        let label = item.chart.data.labels[item.dataIndex];
+        if (Array.isArray(label)) {
+            return label.join(' ');
+        }
+        return label;
+    };
+    
+    const sharedChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: {
+                    color: '#004369',
+                    font: {
+                        size: 14,
+                        family: 'Inter'
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    title: tooltipTitleCallback
+                },
+                backgroundColor: 'rgba(0, 67, 105, 0.9)',
+                titleFont: {
+                    size: 16,
+                    family: 'Inter'
+                },
+                bodyFont: {
+                    size: 14,
+                    family: 'Inter'
+                },
+                padding: 10,
+                cornerRadius: 4
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: '#01949A',
+                    font: {
+                       family: 'Inter'
+                    }
+                },
+                grid: {
+                    display: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: '#01949A',
+                    font: {
+                       family: 'Inter'
+                    }
+                },
+                grid: {
+                    color: '#E5DDC8'
+                }
+            }
+        }
+    };
+
+    const utilizationData = {
+        labels: [
+            '核电 (基荷电源)', 
+            '火电 (基荷兼调峰)', 
+            '水电 (季节性)', 
+            '风电 (间歇性)', 
+            '光伏 (间歇性)'
+        ].map(wrapLabels),
+        datasets: [{
+            label: '优秀小时数',
+            data: [7500, 5500, 4000, 2500, 1300],
+            backgroundColor: '#01949A',
+            borderColor: '#004369',
+            borderWidth: 1,
+            borderRadius: 4,
+        }, {
+            label: '良好/正常小时数',
+            data: [7000, 4500, 3000, 2000, 1000],
+            backgroundColor: 'rgba(1, 148, 154, 0.5)',
+            borderColor: '#004369',
+            borderWidth: 1,
+            borderRadius: 4,
+        }]
+    };
+    const utilizationCtx = document.getElementById('utilizationHoursChart').getContext('2d');
+    new Chart(utilizationCtx, {
+        type: 'bar',
+        data: utilizationData,
+        options: {
+            ...sharedChartOptions,
+            indexAxis: 'y',
+            plugins: {
+                legend: sharedChartOptions.plugins.legend,
+                tooltip: sharedChartOptions.plugins.tooltip,
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#004369',
+                    font: {
+                        weight: 'bold',
+                        family: 'Inter'
+                    },
+                    formatter: function(value) {
+                        return value.toLocaleString();
+                    },
+                    offset: 8,
+                    padding: {
+                        right: 4
+                    }
+                }
+            },
+            scales: {
+                x: { 
+                    ...sharedChartOptions.scales.x, 
+                    title: { display: true, text: '年利用小时数 (小时)', color: '#004369' },
+                    afterDataLimits: (axis) => {
+                        axis.max = axis.max * 1.15;
+                    }
+                },
+                y: { ...sharedChartOptions.scales.y }
+            }
+        }
+    });
+
+    const thermalCostData = {
+        labels: ['燃料成本 (Variable Fuel Cost)', '固定成本 (Fixed Cost)'],
+        datasets: [{
+            data: [70, 30],
+            backgroundColor: ['#DB1F48', '#004369'],
+            hoverOffset: 4
+        }]
+    };
+    const thermalCtx = document.getElementById('thermalCostChart').getContext('2d');
+    new Chart(thermalCtx, {
+        type: 'doughnut',
+        data: thermalCostData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+             plugins: {
+                legend: { position: 'top', labels: { color: '#004369' } },
+                tooltip: sharedChartOptions.plugins.tooltip
+            }
+        }
+    });
+
+    const renewableCostData = {
+        labels: ['固定成本 (Fixed Cost)', '运维成本 (Variable O&M Cost)'],
+        datasets: [{
+            data: [90, 10],
+            backgroundColor: ['#004369', '#01949A'],
+            hoverOffset: 4
+        }]
+    };
+    const renewableCtx = document.getElementById('renewableCostChart').getContext('2d');
+    new Chart(renewableCtx, {
+        type: 'doughnut',
+        data: renewableCostData,
+        options: {
+             responsive: true,
+            maintainAspectRatio: false,
+             plugins: {
+                legend: { position: 'top', labels: { color: '#004369' } },
+                tooltip: sharedChartOptions.plugins.tooltip
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
+
